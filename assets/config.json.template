@@ -1,0 +1,19 @@
+{
+  "authentication": {
+    "method": "username_password",
+    "username": "<your NCCN email>",
+    "password": "<your_password_here>",
+    "cookie_file": "extracted_cookies.txt"
+  },
+  "download_settings": {
+    "max_retries": 3,
+    "retry_delay": 5,
+    "request_delay": [2, 5],
+    "min_file_size": 102400,
+    "timeout": 30
+  },
+  "directories": {
+    "base_download_dir": "nccn_downloads",
+    "logs_dir": "logs"
+  }
+}
