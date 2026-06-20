@@ -29,15 +29,18 @@ from unittest.mock import patch
 logging.disable(logging.CRITICAL)
 
 # 动态加载主脚本模块（避免 __main__ 触发交互式菜单）
-SCRIPT_PATH = "download_NCCN_Guide_v2_menu.py"
+SCRIPT_PATH = "download_nccn.py"
 spec = importlib.util.spec_from_file_location("nccn_main", SCRIPT_PATH)
 nccn_module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(nccn_module)
 
+# ncd.py is optional in skill deployment
 NCD_SCRIPT_PATH = "ncd.py"
-ncd_spec = importlib.util.spec_from_file_location("ncd_cli", NCD_SCRIPT_PATH)
-ncd_module = importlib.util.module_from_spec(ncd_spec)
-ncd_spec.loader.exec_module(ncd_module)
+ncd_module = None
+if os.path.exists(NCD_SCRIPT_PATH):
+    ncd_spec = importlib.util.spec_from_file_location("ncd_cli", NCD_SCRIPT_PATH)
+    ncd_module = importlib.util.module_from_spec(ncd_spec)
+    ncd_spec.loader.exec_module(ncd_module)
 
 
 class TestLanguageDetection(unittest.TestCase):
@@ -372,8 +375,9 @@ class TestCancerFilter(unittest.TestCase):
         self.assertNotIn("guidelines detail", [i.lower() for i in items])
 
 
+@unittest.skipUnless(ncd_module is not None, "ncd.py not available in skill deployment")
 class TestCLIAndRagHelpers(unittest.TestCase):
-    """CLI 与 RAG 辅助函数回归测试"""
+    """CLI 与 RAG 辅助函数回归测试（依赖 ncd.py / nccn_rag.py，技能部署中可选）"""
 
     def test_cli_download_arguments(self):
         parser = ncd_module.build_parser()
