@@ -1,6 +1,8 @@
 # 敏感配置文件（含密钥/凭证）
 config.json
 extracted_cookies.txt
+scripts/config.json
+scripts/extracted_cookies.txt
 
 # 下载的文件目录
 nccn_downloads/

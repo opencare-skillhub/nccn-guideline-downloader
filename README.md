@@ -31,14 +31,16 @@ pip install -r scripts/requirements.txt
 
 ### 3. 配置认证
 
+配置文件放在 `scripts/` 目录下（与下载脚本同级）：
+
 ```bash
-cp assets/config.json.template config.json
-# 编辑 config.json 填入你的 NCCN 认证信息
+cp assets/config.json.template scripts/config.json
+# 编辑 scripts/config.json 填入你的 NCCN 认证信息
 ```
 
 支持两种认证方式：
+- **Cookie（推荐）**：设置 `method: "cookie"`，将 `extracted_cookies.txt` 放在 `scripts/` 目录
 - **用户名密码**：设置 `method: "username_password"`，填写 `username` 和 `password`
-- **Cookie**：设置 `method: "cookie"`，提供 `extracted_cookies.txt` 文件或设置 `cookie` 字段
 
 也可通过环境变量配置（优先级更高）：
 ```bash
@@ -75,12 +77,13 @@ nccn-guideline-downloader/
 ├── scripts/
 │   ├── download_nccn.py        # 下载主脚本
 │   ├── test_offline.py         # 离线测试（42项）
-│   └── requirements.txt        # Python 依赖
+│   ├── requirements.txt        # Python 依赖
+│   ├── config.json             # 你的配置（不提交到 Git）
+│   └── extracted_cookies.txt   # Cookie文件（不提交到 Git）
 ├── references/
 │   └── cancer_types.md         # 65种癌种列表
 ├── assets/
 │   └── config.json.template    # 配置模板
-├── config.json                 # 你的配置（不提交到 Git）
 └── nccn_downloads/             # 下载目录（不提交到 Git）
 ```
 

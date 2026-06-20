@@ -12,8 +12,9 @@ Download NCCN (National Comprehensive Cancer Network) clinical guidelines and pa
 On first use, guide the user through configuration:
 
 1. Install dependencies: `pip install -r scripts/requirements.txt`
-2. Copy config template: `cp assets/config.json.template config.json`
-3. Edit `config.json` with NCCN credentials (username/password or cookie)
+2. Copy config template: `cp assets/config.json.template scripts/config.json`
+3. Edit `scripts/config.json` with NCCN credentials (username/password or cookie)
+4. If using cookie auth, place `extracted_cookies.txt` in `scripts/` directory
 
 ## Workflow
 
