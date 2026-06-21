@@ -7,14 +7,72 @@ description: "Download NCCN clinical practice guidelines and patient manuals in 
 
 Download NCCN (National Comprehensive Cancer Network) clinical guidelines and patient manuals through a guided conversational workflow.
 
-## Setup
+## Configuration Check (Run First)
 
-On first use, guide the user through configuration:
+Before downloading, the script automatically checks configuration at startup. Two files must exist in the **`scripts/`** directory (same folder as the script):
 
-1. Install dependencies: `pip install -r scripts/requirements.txt`
-2. Copy config template: `cp assets/config.json.template scripts/config.json`
-3. Edit `scripts/config.json` with NCCN credentials (username/password or cookie)
-4. If using cookie auth, place `extracted_cookies.txt` in `scripts/` directory
+| File | Path | Purpose |
+|------|------|---------|
+| Config | `scripts/config.json` | Authentication method and settings |
+| Cookie | `scripts/extracted_cookies.txt` | Cookie string for authentication |
+
+**If config is missing**, the script prints a detailed guide and exits. Do NOT proceed with download until config is complete.
+
+### Setup Steps
+
+1. **Install dependencies:**
+   ```bash
+   pip install -r scripts/requirements.txt
+   ```
+
+2. **Create config file** (copy from template):
+   ```bash
+   cp assets/config.json.template scripts/config.json
+   ```
+   Default `scripts/config.json` uses cookie auth — no edits needed for cookie method.
+
+3. **Get NCCN Cookie and save to `scripts/extracted_cookies.txt`:**
+   - Login at https://www.nccn.org/
+   - Press F12 → Network tab → refresh page → click any request
+   - Copy the `Cookie:` header value from Request Headers
+   - Paste the entire string into `scripts/extracted_cookies.txt` (one line only)
+
+4. **Verify config** by running the script — it will confirm:
+   ```
+   ✅ 成功读取配置文件: .../scripts/config.json
+   ✅ 认证方式: Cookie 文件  (.../scripts/extracted_cookies.txt)
+   ```
+
+### Config File Reference
+
+**Cookie auth (recommended)** — `scripts/config.json`:
+```json
+{
+  "authentication": {
+    "method": "cookie",
+    "cookie_file": "extracted_cookies.txt"
+  }
+}
+```
+
+**Username/password auth** — `scripts/config.json`:
+```json
+{
+  "authentication": {
+    "method": "username_password",
+    "username": "your@email.com",
+    "password": "your_password"
+  }
+}
+```
+
+**Environment variables** (override config file):
+```bash
+export NCCN_COOKIE="name1=val1; name2=val2; ..."   # highest priority
+export NCCN_AUTH_METHOD="username_password"
+export NCCN_USERNAME="your@email.com"
+export NCCN_PASSWORD="your_password"
+```
 
 ## Workflow
 
@@ -61,27 +119,31 @@ Show summary, confirm, then run:
 python3 scripts/download_nccn.py
 ```
 
-## Execution Modes
+## Execution
 
-**Interactive (recommended):** Run the script directly and let the user interact with the menu.
+**Interactive (recommended):**
 
 ```bash
+cd ~/.agents/skills/nccn-guideline-downloader
 python3 scripts/download_nccn.py
 ```
 
-**Guided:** You orchestrate the conversation, collect choices, then run the script with the collected parameters.
+**Guided:** Orchestrate the conversation, collect choices, then run the script with the collected parameters.
 
 ## Key Behaviors
 
-- Downloads go to `nccn_downloads/` subdirectory (auto-created)
+- Config files are always resolved relative to **`scripts/`** directory (where the script lives)
+- Downloads go to `scripts/nccn_downloads/` subdirectory (auto-created)
 - Existing valid PDFs are skipped (checks `%PDF` header + 100KB minimum)
 - Failed downloads retry up to 3 times with exponential backoff
 - Domain whitelist enforced: only `nccn.org` and subdomains
-- Download stats saved to `nccn_downloads/logs/stats_*.json`
+- Download stats saved to `scripts/nccn_downloads/logs/stats_*.json`
 - 42 offline tests available: `python3 scripts/test_offline.py`
 
 ## Troubleshooting
 
-- **Auth failure:** Check `config.json` credentials or refresh cookie
+- **Config missing:** Run `cp assets/config.json.template scripts/config.json`
+- **Cookie file missing:** Save browser Cookie string to `scripts/extracted_cookies.txt`
+- **Auth failure:** Cookie expired — refresh browser Cookie and overwrite `scripts/extracted_cookies.txt`
 - **No PDFs found:** NCCN site structure may have changed; try `L` to refresh cancer list
 - **Corrupted files:** Script validates `%PDF` header; check logs for file sizes
